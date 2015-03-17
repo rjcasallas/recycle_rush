@@ -14,51 +14,38 @@
  * don't. Unless you know what you are doing, complex code will be much more difficult under
  * this system. Use IterativeRobot or Command-Based instead if you're new.
  */
-class Robot: public SampleRobot {
-
+class Robot: public SampleRobot
+{
     const float SLOW_SPEED = 0.2;
     const float MEDIUM_SPEED = 0.5;
     const float FULL_SPEED = 0.8;
 
-
-    Talon left_front;
+    // Wheels
     Talon right_front;
-    Talon left_back;
+    Talon left_front;
     Talon right_back;
-    Joystick stick; // only joystick
-    Joystick stick2;
+    Talon left_back;
     WheelVector wheels_out;
+    // Crab arms
     CANTalon crab_arms;
     Victor right_spinner;
     Victor left_spinner;
-    CANTalon left_arm;
+    // Raising arms
     CANTalon right_arm;
-    AnalogInput sonar;
+    CANTalon left_arm;
+    // Joysticks
+    Joystick stick;
+    Joystick stick2;
+    // Sensors and switches
     DigitalInput main_arm_limit;
-
-
-    //DigitalInput       ;
-
-
-
-
-
-
-    /**
-
-     float wheels_sideways, wheels_back_forward, wheels_rotate;
-     float crab_forward, crab_backward;
-     float crab_in_out;
-     float crab_rotate;
-
-     **/
+    AnalogInput sonar;
 
 public:
-    Robot() :
-            left_front(1), right_front(0), left_back(3), right_back(2),
-            stick(0), stick2(1),
-            crab_arms(0), right_spinner(4), left_spinner(5), left_arm(2), right_arm(1),
-            sonar(0), main_arm_limit(0)
+    Robot() :   right_front(0), left_front(1), right_back(2), left_back(3),
+                crab_arms(0), right_spinner(4), left_spinner(5),
+                left_arm(2), right_arm(1),
+                stick(0), stick2(1),
+                main_arm_limit(0), sonar(0)
     {
 
     }
@@ -66,33 +53,31 @@ public:
     /**
      * Drive left & right motors for 2 seconds then stop
      */
-    void Autonomous() {
-
+    void Autonomous()
+    {
+        // TODO
     }
 
     /**
      * Runs the motors with arcade steering.
      */
-    void OperatorControl() {
-
+    void OperatorControl()
+    {
         float wheels_sideways, wheels_back_forward, wheels_rotate;
         float crab_forward;
         float crab_backward;
         float crab_in_out;
         float crab_rotate;
         float arm_up_down;
-        float arm_speed = MEDIUM_SPEED;  // medium speed
-
-
+        float arm_speed = MEDIUM_SPEED;
 
         while (IsOperatorControl() && IsEnabled())
         {
-
+            // Buttons
             if(stick2.GetRawButton(3))
             {
                 arm_speed = SLOW_SPEED;
             }
-
             if(stick2.GetRawButton(1))
             {
                arm_speed = MEDIUM_SPEED;
@@ -102,6 +87,7 @@ public:
                 arm_speed = FULL_SPEED;
             }
 
+            // Movements
             wheels_sideways = stick.GetX(stick.kLeftHand);
             wheels_back_forward = stick.GetY(stick.kLeftHand);
             wheels_rotate = stick.GetRawAxis(4);
@@ -115,8 +101,7 @@ public:
             // Mecanum section
             //
 
-            wheels_out = WheelVector::calc(wheels_sideways,
-                    -wheels_back_forward, wheels_rotate);
+            wheels_out = WheelVector::calc(wheels_sideways, -wheels_back_forward, wheels_rotate);
             wheels_out.zero(0.05);
 
             left_front.Set(wheels_out.getLeftFront());
@@ -133,7 +118,6 @@ public:
 
             if(main_arm_limit.Get() && arm_up_down > 0)
             {
-
                 left_arm.Set(0);
                 right_arm.Set(0);
             }
@@ -143,12 +127,9 @@ public:
                 right_arm.Set(arm_up_down);
             }
 
-
-
             //
             //  Crab_Arms
             //
-
 
             crab_arms.Set(crab_forward - crab_backward);
 
@@ -156,23 +137,21 @@ public:
             right_spinner.Set(crab_in_out - crab_rotate);
             left_spinner.Set(crab_rotate + crab_in_out);
 
+            // Debug Outputs
             SmartDashboard::PutNumber("sonar value", sonar.GetValue());
             SmartDashboard::PutNumber("main_arm_limit", main_arm_limit.Get());
             SmartDashboard::PutNumber("arm_speed", arm_speed);
+
             Wait(.05);
-
         }
-
-        /*while (IsOperatorControl() && IsEnabled())
-         {
-         Wait(0.005);				// wait for a motor update time
-         }*/
     }
 
     /**
      * Runs during test mode
      */
-    void Test() {
+    void Test()
+    {
+        // TODO
     }
 };
 
