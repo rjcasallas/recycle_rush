@@ -73,6 +73,7 @@ public:
         float wheel_speed = MEDIUM_SPEED;
         float arm_speed = MEDIUM_SPEED;
         float arm_up_down;
+        bool override = false;
 
 
         while (IsOperatorControl() && IsEnabled())
@@ -103,6 +104,15 @@ public:
             else if(stick2.GetRawButton(2))
             {
                 arm_speed = FULL_SPEED;
+            }
+            // EMERGENCY OVERRIDE!!
+            if(stick2.GetRawButton(7))
+            {
+                override = false;
+            }
+            if(stick2.GetRawButton(8))
+            {
+                override = true;
             }
 
             // Movements
@@ -138,7 +148,7 @@ public:
             // WARNING: LEFT HAS TO BE NEGATED FOR BOTH ARMS MOVE IN THE SAME DIRECTION
             //          OTHERWISE, THE ROBOT WILL BREAK!!!!!
 
-            if( (arm_low_limit.Get() && arm_down > 0) || (arm_high_limit.Get() && arm_up > 0) )
+            if( ( (arm_low_limit.Get() && arm_down > 0) || (arm_high_limit.Get() && arm_up > 0) ) && !override )
             {
                 left_arm.Set(0);
                 right_arm.Set(0);
@@ -167,6 +177,7 @@ public:
             SmartDashboard::PutNumber("arm_down", arm_down);
             SmartDashboard::PutNumber("arm_up_downp", arm_up_down);
             SmartDashboard::PutNumber("arm_speed", arm_speed);
+            SmartDashboard::PutNumber("override", override);
 
             Wait(.05);
         }
