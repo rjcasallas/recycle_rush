@@ -70,11 +70,28 @@ public:
         float crab_rotate;
         float arm_up;
         float arm_down;
+        float wheel_speed = MEDIUM_SPEED;
         float arm_speed = MEDIUM_SPEED;
+        float arm_up_down;
+
 
         while (IsOperatorControl() && IsEnabled())
         {
-            // Buttons
+            // Wheel Driver's Buttons
+            if(stick.GetRawButton(3))
+            {
+                wheel_speed = SLOW_SPEED;
+            }
+            else if(stick.GetRawButton(1))
+            {
+                wheel_speed = MEDIUM_SPEED;
+            }
+            else if(stick.GetRawButton(2))
+            {
+                wheel_speed = FULL_SPEED;
+            }
+
+            // Arm Driver's Buttons
             if(stick2.GetRawButton(3))
             {
                 arm_speed = SLOW_SPEED;
@@ -89,23 +106,25 @@ public:
             }
 
             // Movements
-            wheels_sideways = stick.GetX(stick.kLeftHand);
-            wheels_back_forward = stick.GetY(stick.kLeftHand);
-            wheels_rotate = stick.GetRawAxis(4);
+            wheels_sideways = stick.GetX(stick.kLeftHand) * wheel_speed;
+            wheels_back_forward = stick.GetY(stick.kLeftHand) * wheel_speed;
+            wheels_rotate = stick.GetRawAxis(4) * wheel_speed;
             
-            crab_back_forward = stick2.GetY(stick2.kLeftHand);
-            crab_in_out = stick2.GetY(stick2.kRightHand);   // spinner in out
-            crab_rotate = stick2.GetX(stick2.kRightHand);   // spinner
+            crab_back_forward = stick2.GetY(stick2.kLeftHand) * arm_speed;
+            crab_in_out = stick2.GetRawAxis(5) * arm_speed ;   // spinner in out
+            crab_rotate = stick2.GetRawAxis(4) * arm_speed;  // spinner
 
             arm_up = stick2.GetRawAxis(3) * arm_speed;
             arm_down = stick2.GetRawAxis(2) * arm_speed;
+            arm_up_down = arm_down - arm_up;
+
             
             //
             // Mecanum section
             //
 
-            wheels_out = WheelVector::calc(wheels_sideways, -wheels_back_forward, wheels_rotate);
-            wheels_out.zero(0.05);
+            wheels_out = WheelVector::calc(-wheels_sideways, -wheels_back_forward, -wheels_rotate);
+            wheels_out.zero(0.02);
 
             left_front.Set(wheels_out.getLeftFront());
             left_back.Set(wheels_out.getLeftBack());
@@ -119,7 +138,7 @@ public:
             // WARNING: LEFT HAS TO BE NEGATED FOR BOTH ARMS MOVE IN THE SAME DIRECTION
             //          OTHERWISE, THE ROBOT WILL BREAK!!!!!
 
-            if( (arm_low_limit.Get() && arm_up_down > 0) || (arm_high_limit.Get() && arm_up_down < 0) )
+            if( (arm_low_limit.Get() && arm_down > 0) || (arm_high_limit.Get() && arm_up > 0) )
             {
                 left_arm.Set(0);
                 right_arm.Set(0);
@@ -142,7 +161,11 @@ public:
 
             // Debug Outputs
             SmartDashboard::PutNumber("sonar value", sonar.GetValue());
-            SmartDashboard::PutNumber("main_arm_limit", main_arm_limit.Get());
+            SmartDashboard::PutNumber("arm_low_limit", arm_low_limit.Get());
+            SmartDashboard::PutNumber("arm_high_limit", arm_high_limit.Get());
+            SmartDashboard::PutNumber("arm_up", arm_up);
+            SmartDashboard::PutNumber("arm_down", arm_down);
+            SmartDashboard::PutNumber("arm_up_downp", arm_up_down);
             SmartDashboard::PutNumber("arm_speed", arm_speed);
 
             Wait(.05);
