@@ -37,7 +37,8 @@ class Robot: public SampleRobot
     Joystick stick;
     Joystick stick2;
     // Sensors and switches
-    DigitalInput main_arm_limit;
+    DigitalInput arm_low_limit;
+    DigitalInput arm_high_limit;
     AnalogInput sonar;
 
 public:
@@ -45,7 +46,7 @@ public:
                 crab_arms(0), right_spinner(4), left_spinner(5),
                 left_arm(2), right_arm(1),
                 stick(0), stick2(1),
-                main_arm_limit(0), sonar(0)
+                arm_low_limit(0), arm_high_limit(1), sonar(0)
     {
 
     }
@@ -64,11 +65,11 @@ public:
     void OperatorControl()
     {
         float wheels_sideways, wheels_back_forward, wheels_rotate;
-        float crab_forward;
-        float crab_backward;
+        float crab_back_forward;
         float crab_in_out;
         float crab_rotate;
-        float arm_up_down;
+        float arm_up;
+        float arm_down;
         float arm_speed = MEDIUM_SPEED;
 
         while (IsOperatorControl() && IsEnabled())
@@ -78,11 +79,11 @@ public:
             {
                 arm_speed = SLOW_SPEED;
             }
-            if(stick2.GetRawButton(1))
+            else if(stick2.GetRawButton(1))
             {
                arm_speed = MEDIUM_SPEED;
             }
-            if(stick2.GetRawButton(2))
+            else if(stick2.GetRawButton(2))
             {
                 arm_speed = FULL_SPEED;
             }
@@ -91,12 +92,14 @@ public:
             wheels_sideways = stick.GetX(stick.kLeftHand);
             wheels_back_forward = stick.GetY(stick.kLeftHand);
             wheels_rotate = stick.GetRawAxis(4);
-            crab_forward = stick2.GetRawAxis(3);
-            crab_backward = stick2.GetRawAxis(2);
-            crab_in_out = stick2.GetY(stick2.kLeftHand); // spinner in out
-            crab_rotate = stick2.GetX(stick2.kLeftHand);  // spinner
-            arm_up_down = stick2.GetRawAxis(5) * arm_speed;
+            
+            crab_back_forward = stick2.GetY(stick2.kLeftHand);
+            crab_in_out = stick2.GetY(stick2.kRightHand);   // spinner in out
+            crab_rotate = stick2.GetX(stick2.kRightHand);   // spinner
 
+            arm_up = stick2.GetRawAxis(3) * arm_speed;
+            arm_down = stick2.GetRawAxis(2) * arm_speed;
+            
             //
             // Mecanum section
             //
@@ -116,7 +119,7 @@ public:
             // WARNING: LEFT HAS TO BE NEGATED FOR BOTH ARMS MOVE IN THE SAME DIRECTION
             //          OTHERWISE, THE ROBOT WILL BREAK!!!!!
 
-            if(main_arm_limit.Get() && arm_up_down > 0)
+            if( (arm_low_limit.Get() && arm_up_down > 0) || (arm_high_limit.Get() && arm_up_down < 0) )
             {
                 left_arm.Set(0);
                 right_arm.Set(0);
@@ -131,7 +134,7 @@ public:
             //  Crab_Arms
             //
 
-            crab_arms.Set(crab_forward - crab_backward);
+            crab_arms.Set(crab_back_forward);
 
             // spinners
             right_spinner.Set(crab_in_out - crab_rotate);
