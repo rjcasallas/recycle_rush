@@ -69,16 +69,23 @@ public:
 
         // (front = x )(sideways = Y)(rotation = Z)
 
-        SetWheels(-0.2, 0, 0);
+        SetWheels(-0.3, 0, 0);
 
-        Wait(1.5);  //    for 2 seconds
+        Wait(2);  //    for 2 seconds
+
+        SetWheels(0, 0, 0);
+
+        Wait(1);
+
+        SetWheels(0, 0, -0.3);
+
+        Wait(2.3);  //    for 2 seconds
 
         SetWheels(0, 0, 0);
 
         Wait(1);
 
         /*
-
 
          RiseArm(0.31, 0, false);
 
