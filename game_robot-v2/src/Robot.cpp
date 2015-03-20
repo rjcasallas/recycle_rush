@@ -36,27 +36,32 @@ class Robot: public SampleRobot
     // Raising arms
     CANTalon right_arm;
     CANTalon left_arm;
-    // Joysticks
+    // Joystick
     Joystick stick;
     Joystick stick2;
     // Sensors and switches
     DigitalInput arm_low_limit;
     DigitalInput arm_high_limit;
+    DigitalInput crab_back_limit;
     AnalogInput sonar;
 
 public:
     Robot() :
             right_front(0), left_front(1), right_back(2), left_back(3), crab_arms(0), right_spinner(4), left_spinner(5), right_arm(1), left_arm(2), stick(0), stick2(1), arm_low_limit(0), arm_high_limit(
-                    1), sonar(0)
+                    1), crab_back_limit(2), sonar(0)
     {
 
     }
 
     void RobotInit() override
     {
-        CameraServer::GetInstance()->SetQuality(25);
+        CameraServer::GetInstance()->SetQuality(50);
+        //CameraServer::GetInstance()->SetSize(1);
+
         //the camera name (ex "cam0") can be found through the roborio web interface
+
         CameraServer::GetInstance()->StartAutomaticCapture("cam2");
+
     }
 
     /**
@@ -109,7 +114,7 @@ public:
 
 
 
-         /******
+
 
 
          // Wait(0.5);
@@ -215,7 +220,7 @@ public:
 
     }
 
-    void ExtendArms(float back_forward)
+    void ExtendArms(float back_forward, bool override)
     {
         if (back_forward > FULL_SPEED)
         {
@@ -227,7 +232,16 @@ public:
             back_forward = -FULL_SPEED;
         }
 
-        crab_arms.Set(back_forward);
+        if (crab_back_limit.Get() && back_forward > 0 && !override)
+
+        {
+            crab_arms.Set(0);
+        }
+
+        else
+        {
+            crab_arms.Set(back_forward);
+        }
 
     }
 
@@ -259,7 +273,7 @@ public:
 
     }
 
-    //void CrabArmSpinner
+//void CrabArmSpinner
 
     void OperatorControl()
     {
@@ -353,7 +367,7 @@ public:
             //  Crab_Arms
             //
 
-            ExtendArms(crab_back_forward);
+            ExtendArms(crab_back_forward, override);
 
             // spinners
 
@@ -363,6 +377,7 @@ public:
             SmartDashboard::PutNumber("sonar value", sonar.GetValue());
             SmartDashboard::PutNumber("arm_low_limit", arm_low_limit.Get());
             SmartDashboard::PutNumber("arm_high_limit", arm_high_limit.Get());
+            SmartDashboard::PutNumber("crab_back_limit", crab_back_limit.Get());
             SmartDashboard::PutNumber("arm_up", arm_up);
             SmartDashboard::PutNumber("arm_down", arm_down);
             SmartDashboard::PutNumber("arm_speed", arm_speed);
