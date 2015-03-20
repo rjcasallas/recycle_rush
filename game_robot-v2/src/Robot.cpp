@@ -52,9 +52,17 @@ public:
 
     }
 
+    void RobotInit() override
+    {
+        CameraServer::GetInstance()->SetQuality(50);
+        //the camera name (ex "cam0") can be found through the roborio web interface
+        CameraServer::GetInstance()->StartAutomaticCapture("cam2");
+    }
+
     /**
      * Drive left & right motors for 2 seconds then stop
      */
+
     void Autonomous()
     {
 
@@ -62,9 +70,9 @@ public:
 
         // (front = x )(sideways = Y)(rotation = Z)
 
-        SetWheels(-0.3, 0, 0);
+        SetWheels(-0.2, 0, 0);
 
-        Wait(0.5);  //    for 2 seconds
+        Wait(1.5);  //    for 2 seconds
 
         SetWheels(0, 0, 0);
 
