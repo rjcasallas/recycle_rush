@@ -77,7 +77,7 @@ public:
 
         Wait(1);
 
-        SetWheels(0, 0, -0.3);
+        SetWheels(0, 0, -0.3);   // Negative rotates left, Positive rotates right
 
         Wait(2.3);  //    for 2 seconds
 
