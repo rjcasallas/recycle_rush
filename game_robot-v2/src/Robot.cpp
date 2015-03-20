@@ -54,7 +54,7 @@ public:
 
     void RobotInit() override
     {
-        CameraServer::GetInstance()->SetQuality(50);
+        CameraServer::GetInstance()->SetQuality(25);
         //the camera name (ex "cam0") can be found through the roborio web interface
         CameraServer::GetInstance()->StartAutomaticCapture("cam2");
     }
@@ -62,7 +62,6 @@ public:
     /**
      * Drive left & right motors for 2 seconds then stop
      */
-
     void Autonomous()
     {
 
