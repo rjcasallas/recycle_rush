@@ -82,9 +82,20 @@ public:
 
         Wait(1);
 
-        SetWheels(0, 0, -0.3);   // Negative rotates left, Positive rotates right
+        /*
+         SetWheels(0, 0, -0.3);   // Negative rotates left, Positive rotates right
 
-        Wait(2.3);  //    for 2 seconds
+         Wait(2.3);  //    for 2 seconds
+
+         SetWheels(0, 0, 0);
+
+         Wait(1);
+         */
+
+        //180 turn test
+        SetWheels(0, 0, -0.42);   // Negative rotates left, Positive rotates right
+
+        Wait(2.5);           // for 2.5 seconds
 
         SetWheels(0, 0, 0);
 
